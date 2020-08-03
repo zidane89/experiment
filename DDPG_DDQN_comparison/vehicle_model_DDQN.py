@@ -14,7 +14,7 @@ class Environment:
         self.cell_model = cell_model
         self.reward_factor = reward_factor
 
-        self.version = 0
+        self.version = "ref"
 
         self.vehicle_comp = {
             "m_veh": 900,
@@ -124,7 +124,7 @@ class Environment:
         self.fuel_consumption = 0
         # state = [self.tq_out[self.step_num], self.sp_out[self.step_num], self.SOC]
         j_min, j_max, _ = self.get_curdensity_region(self.p_mot[self.step_num])
-        state = [self.power_out[self.step_num] / 1000, self.SOC, j_min, j_max]
+        state = [self.power_out_norm[self.step_num], self.SOC, j_min, j_max]
         # state = [self.power_out_norm[self.step_num], self.SOC - 0.6]
         self.history = {
             "SOC": [],
@@ -201,7 +201,7 @@ class Environment:
             print("maximum steps, simulation is done ... ")
         else:
             j_min, j_max, done = self.get_curdensity_region(self.p_mot[self.step_num])
-            state = [self.power_out[self.step_num] / 1000, self.SOC, j_min, j_max]
+            state = [self.power_out_norm[self.step_num], self.SOC, j_min, j_max]
 
         return state, done
 
@@ -281,11 +281,11 @@ class Environment:
         return fuel_consumption
 
 
-# drving_cycle = './OC_SIM_DB/OC_SIM_DB_Cycles/Highway/01_FTP72_fuds.mat'
-# battery_path = "./OC_SIM_DB/OC_SIM_DB_Bat/OC_SIM_DB_Bat_e-4wd_Battery.mat"
-# motor_path = "./OC_SIM_DB/OC_SIM_DB_Mot/OC_SIM_DB_Mot_id_75_110_Westinghouse.mat"
-# cell_model = CellModel()
-# env = Environment(cell_model, drving_cycle, battery_path, motor_path, 0.1)
+drving_cycle = '../../OC_SIM_DB/OC_SIM_DB_Cycles/Highway/01_FTP72_fuds.mat'
+battery_path = "../../OC_SIM_DB/OC_SIM_DB_Bat/OC_SIM_DB_Bat_e-4wd_Battery.mat"
+motor_path = "../../OC_SIM_DB/OC_SIM_DB_Mot/OC_SIM_DB_Mot_id_75_110_Westinghouse.mat"
+cell_model = CellModel()
+env = Environment(cell_model, drving_cycle, battery_path, motor_path, 0.1)
 #
 # for i in range(env.cycle_length):
 #     print(i)
