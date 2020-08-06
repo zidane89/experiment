@@ -28,9 +28,9 @@ class Environment:
             "g": 9.8,
         }
         self.stack_comp = {
-            "cell_number": 70,
-            "effective_area_cell": 150.0,
-            "max_current_density": 0.8,
+            "cell_number": 150,
+            "effective_area_cell": 200.0,
+            "max_current_density": 1.0,
             "idling_current_density": 0.01,
             "Faraday_constant": 96485,
             "molar_mass_H2": 2.016,
