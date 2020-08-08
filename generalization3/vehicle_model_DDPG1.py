@@ -28,8 +28,8 @@ class Environment:
             "g": 9.8,
         }
         self.stack_comp = {
-            "cell_number": 150,
-            "effective_area_cell": 150.0,
+            "cell_number": 200,
+            "effective_area_cell": 200.0,
             "max_current_density": 1.0,
             "idling_current_density": 0.01,
             "Faraday_constant": 96485,
@@ -247,13 +247,15 @@ class Environment:
         return con_mot
 
     def condition_check_battery(self, p_bat):
+        condition = True
+
         v_dis, v_cha, r_dis, r_cha, i_lim_dis, i_lim_cha = self.get_battery_state()
         del_i = (1 / (2 * r_cha)) * (v_cha - (v_cha ** 2 - 4 * r_cha * p_bat) ** (0.5)) * (p_bat < 0) + (1 / (
                 2 * r_dis)) * (v_dis - (v_dis ** 2 - 4 * r_dis * p_bat) ** (0.5)) * (p_bat >= 0)
         if ((i_lim_dis - del_i) * (i_lim_cha - del_i)) > 0:
             condition = False
-        else:
-            condition = True
+        elif np.isnan(del_i):
+            condition = False
         return condition
 
     def get_battery_state(self):

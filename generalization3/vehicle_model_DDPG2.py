@@ -29,7 +29,7 @@ class Environment:
         }
         self.stack_comp = {
             "cell_number": 150,
-            "effective_area_cell": 150.0,
+            "effective_area_cell": 200.0,
             "max_current_density": 1.0,
             "idling_current_density": 0.01,
             "Faraday_constant": 96485,
@@ -172,7 +172,7 @@ class Environment:
 
             if np.isnan(self.SOC):
                 done = True
-                reward = -10000
+                reward = -1000
                 print("SOC is nan...")
 
         return state, reward, done
