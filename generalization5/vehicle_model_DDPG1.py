@@ -135,7 +135,8 @@ class Environment:
             "P_motor": [],
             "m_fuel": [],
             "j_min": [],
-            "j_max": []
+            "j_max": [],
+            "reward": []
         }
         return state
 
@@ -204,6 +205,7 @@ class Environment:
         self.history["m_fuel"].append(m_fuel)
         self.history["j_min"].append(j_min)
         self.history["j_max"].append(j_max)
+        self.history["reward"].append(reward)
 
         self.step_num += 1
         if self.step_num == self.cycle_length:
