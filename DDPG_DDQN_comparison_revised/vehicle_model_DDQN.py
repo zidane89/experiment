@@ -31,7 +31,7 @@ class Environment:
             "cell_number": 400,
             "effective_area_cell": 400.0,
             "max_current_density": 1.0,
-            "idling_current_density": 0.05,
+            "idling_current_density": 0.00001,
             "Faraday_constant": 96485,
             "molar_mass_H2": 2.016,
         }
