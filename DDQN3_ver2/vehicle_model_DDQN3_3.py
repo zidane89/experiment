@@ -14,7 +14,7 @@ class Environment:
         self.cell_model = cell_model
         self.reward_factor = reward_factor
 
-        self.version = 3
+        self.version = 2
 
         self.vehicle_comp = {
             "m_veh": 900,
@@ -28,10 +28,10 @@ class Environment:
             "g": 9.8,
         }
         self.stack_comp = {
-            "cell_number": 70,
-            "effective_area_cell": 150.0,
-            "max_current_density": 0.8,
-            "idling_current_density": 0.01,
+            "cell_number": 400,
+            "effective_area_cell": 400.0,
+            "max_current_density": 1.0,
+            "idling_current_density": 0.00001,
             "Faraday_constant": 96485,
             "molar_mass_H2": 2.016,
         }
@@ -124,7 +124,7 @@ class Environment:
         self.fuel_consumption = 0
         # state = [self.tq_out[self.step_num], self.sp_out[self.step_num], self.SOC]
         j_min, j_max, _ = self.get_curdensity_region(self.p_mot[self.step_num])
-        state = [self.power_out[self.step_num] / 1000, self.SOC, j_min, j_max]
+        state = [self.power_out_norm[self.step_num], self.SOC, j_min, j_max]
         # state = [self.power_out_norm[self.step_num], self.SOC - 0.6]
         self.history = {
             "SOC": [],
@@ -166,9 +166,14 @@ class Environment:
             m_fuel = self.cal_fuel_consumption(stack_current)
 
             # reward = self.cal_reward(m_fuel)
-            reward = self.cal_reward(m_fuel)
+            # reward = self.cal_reward(m_fuel)
             self.fuel_consumption += m_fuel
-            state, done = self.post_process(action, p_stack, p_bat, p_mot, m_fuel, j_min, j_max)
+            state, reward, done = self.post_process(action, p_stack, p_bat, p_mot, m_fuel, j_min, j_max)
+
+            if np.isnan(self.SOC):
+                done = True
+                reward = -1000
+                print("SOC is nan...")
 
         return state, reward, done
 
@@ -185,6 +190,7 @@ class Environment:
     def post_process(self, action, p_stack, p_bat, p_mot, m_fuel, j_min, j_max):
         state = None
         done = False
+        reward = self.cal_reward(m_fuel)
 
         self.history["SOC"].append(self.SOC)
         self.history["Action"].append(action)
@@ -201,9 +207,8 @@ class Environment:
             print("maximum steps, simulation is done ... ")
         else:
             j_min, j_max, done = self.get_curdensity_region(self.p_mot[self.step_num])
-            state = [self.power_out[self.step_num] / 1000, self.SOC, j_min, j_max]
-
-        return state, done
+            state = [self.power_out_norm[self.step_num], self.SOC, j_min, j_max]
+        return state, reward, done
 
     def get_curdensity_region(self, p_mot):
         done = False
@@ -220,6 +225,7 @@ class Environment:
         if sum(condition_set) == 0:
             done = True
             j_fc_min, j_fc_max = None, None
+            # print(p_mot)
             print("Available condition is not avail... SOC: {}".format(self.SOC))
 
         else:
@@ -265,14 +271,14 @@ class Environment:
         del_i = (1 / (2 * r_cha)) * (v_cha - (v_cha ** 2 - 4 * r_cha * p_bat) ** (0.5)) * (p_bat < 0) + (1 / (
                 2 * r_dis)) * (v_dis - (v_dis ** 2 - 4 * r_dis * p_bat) ** (0.5)) * (p_bat >= 0)
 
-        if ((i_lim_dis - del_i) * (i_lim_cha - del_i)) > 0:
-            if del_i > 0:
-                print("Constraint error, battery current limit ( motor mode )")
-            else:
-                print("Constraint error, battery current limit ( generator mode)")
-        else:
-            del_soc = -del_i * (self.calculation_comp["del_t"] / self.battery['Q_cap'])
-            self.SOC = min(self.SOC + del_soc, 1)
+        # if ((i_lim_dis - del_i) * (i_lim_cha - del_i)) > 0:
+        #     if del_i > 0:
+        #         print("Constraint error, battery current limit ( motor mode )")
+        #     else:
+        #         print("Constraint error, battery current limit ( generator mode)")
+        # else:
+        del_soc = -del_i * (self.calculation_comp["del_t"] / self.battery['Q_cap'])
+        self.SOC = min(self.SOC + del_soc, 1)
 
     def cal_fuel_consumption(self, stack_current):
         hydrogen_excess_ratio = 1.0

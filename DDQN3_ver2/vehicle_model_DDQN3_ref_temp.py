@@ -14,7 +14,7 @@ class Environment:
         self.cell_model = cell_model
         self.reward_factor = reward_factor
 
-        self.version = 1
+        self.version = 2
 
         self.vehicle_comp = {
             "m_veh": 900,
@@ -28,10 +28,10 @@ class Environment:
             "g": 9.8,
         }
         self.stack_comp = {
-            "cell_number": 400,
-            "effective_area_cell": 400.0,
+            "cell_number": 200,
+            "effective_area_cell": 200.0,
             "max_current_density": 1.0,
-            "idling_current_density": 0.00001,
+            "idling_current_density": 0.01,
             "Faraday_constant": 96485,
             "molar_mass_H2": 2.016,
         }
@@ -124,7 +124,7 @@ class Environment:
         self.fuel_consumption = 0
         # state = [self.tq_out[self.step_num], self.sp_out[self.step_num], self.SOC]
         j_min, j_max, _ = self.get_curdensity_region(self.p_mot[self.step_num])
-        state = [self.power_out[self.step_num], self.SOC, j_min, j_max]
+        state = [self.power_out[self.step_num] / 1000, self.SOC, j_min, j_max]
         # state = [self.power_out_norm[self.step_num], self.SOC - 0.6]
         self.history = {
             "SOC": [],
@@ -207,7 +207,7 @@ class Environment:
             print("maximum steps, simulation is done ... ")
         else:
             j_min, j_max, done = self.get_curdensity_region(self.p_mot[self.step_num])
-            state = [self.power_out[self.step_num], self.SOC, j_min, j_max]
+            state = [self.power_out[self.step_num] / 1000, self.SOC, j_min, j_max]
         return state, reward, done
 
     def get_curdensity_region(self, p_mot):
