@@ -30,6 +30,7 @@ class Environment:
         self.stack_comp = {
             "cell_number": 400,
             "effective_area_cell": 200.0,
+
             "max_current_density": 1.0,
             "idling_current_density": 0.00001,
             "Faraday_constant": 96485,
