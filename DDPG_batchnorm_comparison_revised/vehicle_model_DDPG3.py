@@ -17,7 +17,7 @@ class Environment:
         self.version = 1
 
         self.vehicle_comp = {
-            "m_veh": 900,
+            "m_veh": 1200,
             "cd": 0.456,
             "fa": 2.4,
             "rr": 0.009,
